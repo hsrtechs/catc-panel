@@ -1,0 +1,1 @@
+@extends('gentelella.layout.main')
