@@ -50,11 +50,6 @@ class AuthController extends Controller
         $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
     }
 
-    public static function ownsServer($sid)
-    {
-        return Gate::allows('server-owner-access', [Auth::user()->id, $sid]) || static::isMod();
-    }
-
     public function login(Request $request)
     {
         (filter_var($request->username, FILTER_VALIDATE_EMAIL)) ? $this->username = 'email' : 'username';
@@ -116,7 +111,7 @@ class AuthController extends Controller
      * @return User
      * @internal param User $user
      */
-    protected function create(Request $data)
+    protected function create($data)
     {
         $user = $this->makeUser($data);
 
@@ -125,7 +120,7 @@ class AuthController extends Controller
         return $user;
     }
 
-    public function makeUser(Request $data)
+    public function makeUser($data)
     {
         return User::create([
             'name' => $data['name'],
@@ -138,9 +133,8 @@ class AuthController extends Controller
             'available_cpu' => $data['cpu'],
             'available_storage' => $data['storage'],
             'available_ram' => $data['ram'],
-            'user_assoc' => $data,
+            'user_assoc' => NULL,
             'role_id' => 4,
-
         ]);
     }
 

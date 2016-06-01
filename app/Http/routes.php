@@ -69,7 +69,7 @@ Route::group([
 
     Route::get('dashboard', 'UserController@Dashboard')->name('home');
 
-    Route::get('profile/{user}', 'UserController@Profile');
+    Route::get('profile/{user?}', 'UserController@Profile');
 
     Route::get('settings', function () {
         return view('gentelella.index', ['user' => Auth::user()]);

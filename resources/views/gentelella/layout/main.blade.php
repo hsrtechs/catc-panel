@@ -42,7 +42,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-usermenu pull-right">
                                 <li>
-                                    <a href="{{ action('UserController@Profile',['id' => $user->id])  }}">Profile</a>
+                                    <a href="{{ action('UserController@Profile',['user' => $user->username])  }}">Profile</a>
                                 </li>
                                 <li>
                                     <a href="{{ action('Auth\AuthController@logout') }}"><i

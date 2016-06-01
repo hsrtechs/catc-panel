@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Class User
+ * @property mixed available_cpu
+ * @property mixed max_cpu
+ * @property mixed available_ram
+ * @property mixed max_ram
+ * @property mixed available_storage
+ * @property mixed max_storage
  * @package App
  */
 class User extends Authenticatable
@@ -50,6 +56,9 @@ class User extends Authenticatable
         'role_id',
     ];
 
+    /**
+     * @var array
+     */
     protected $casts = [
         'role_id' => 'int',
         'name' => 'string',
@@ -62,6 +71,11 @@ class User extends Authenticatable
     ];
 
     /**
+     * @var array
+     */
+    protected $appends = ['cpu_percentage', 'ram_percentage', 'storage_percentage'];
+
+    /**
      * Changing the key for the route parameters for the model.
      *
      * @return string
@@ -72,6 +86,10 @@ class User extends Authenticatable
     }
 
     /**
+     *
+     */
+
+    /**
      * Finding the Roles of the USERS
      */
 
@@ -80,41 +98,66 @@ class User extends Authenticatable
         return $this->all();
     }
 
+    /**
+     * @return int
+     */
     public function getAdminsCount()
     {
         return $this->all()->where('role_id', 1)->count();
     }
 
+    /**
+     * @return int
+     */
     public function getModsCount()
     {
         return $this->all()->where('role_id', 2)->count();
     }
 
+    /**
+     * @return int
+     */
     public function getResellersCount()
     {
         return $this->all()->where('role_id', 3)->count();
     }
 
+    /**
+     * @return int
+     */
     public function getSuspendedCount()
     {
         return $this->all()->where('role_id', 9)->count();
     }
 
+    /**
+     * @return int
+     */
     public function getTerminatedCount()
     {
         return $this->all()->where('role_id', 10)->count();
     }
 
+    /**
+     * @return int
+     */
     public function getNormalUsersCount()
     {
         return $this->all()->where('role_id', 4)->count();
     }
 
+    /**
+     * @return bool
+     */
     public function isAdmin()
     {
         return $this->hasRole('Administrator');
     }
 
+    /**
+     * @param $role
+     * @return bool
+     */
     public function hasRole($role)
     {
         if ($this->role()->where('name', $role)->get()->count()) {
@@ -123,21 +166,34 @@ class User extends Authenticatable
         return false;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function role()
     {
         return $this->belongsTo('App\Role');
     }
 
+    /**
+     * @return bool
+     */
     public function isMod()
     {
         return $this->hasRole('Moderator');
     }
 
+    /**
+     * @return bool
+     */
     public function isReseller()
     {
         return $this->hasRole('Reseller');
     }
 
+    /**
+     * @param $permissions
+     * @return bool
+     */
     public function hasAnyPermission($permissions)
     {
         if (is_array($permissions)) {
@@ -153,10 +209,12 @@ class User extends Authenticatable
         return false;
     }
 
+    // Accessors
 
-    //Mutators
-    // Setting the Attributes after getting them from database
-
+    /**
+     * @param $permission
+     * @return bool
+     */
     public function hasPermission($permission)
     {
         if ($this->permissions()->where('name', $permission)->get()->count()) {
@@ -165,34 +223,87 @@ class User extends Authenticatable
         return false;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function permissions()
     {
         return $this->belongsToMany('App\Permission', 'user_permissions');
     }
 
-    public function setRoleIdAttribute($value = NULL)
+    /**
+     * @return float
+     */
+    public function getCpuPercentageAttribute()
     {
-        $this->attributes['role_id'] = (isset($value)) ? $value : 4;
+        return $this->available_cpu * 100 / $this->max_cpu;
     }
 
-    public function setPasswordAttribute($value)
+    //Mutators
+    // Setting the Attributes after getting them from database
+
+    /**
+     * @return float
+     */
+    public function getRamPercentageAttribute()
     {
-        $this->attributes['password'] = bcrypt($value);
+        return $this->available_ram * 100 / $this->max_ram;
+    }
+
+    /**
+     * @return float
+     */
+    public function getStoragePercentageAttribute()
+    {
+        return $this->available_storage * 100 / $this->max_storage;
     }
 
 
     //Relationships
 
+    /**
+     * @param null $value
+     */
+    public function setRoleIdAttribute($value = NULL)
+    {
+        $this->attributes['role_id'] = (isset($value)) ? $value : 4;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function userReseller()
+    {
+        return $this->belongsTo('App\User', 'user_assoc', 'id');
+    }
+
+    /**
+     * @param $value
+     */
     public function setUsernameAttribute($value)
     {
         $this->attributes['username'] = strtolower($value);
     }
 
+    /**
+     * @param null $value
+     */
     public function setUserAssocAttribute($value = NULL)
     {
         $this->attributes['user_assoc'] = (!is_null($value)) ? $value : Auth::user()->id;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function Tickets()
     {
         return $this->hasMany('App\Ticket');
@@ -223,6 +334,9 @@ class User extends Authenticatable
         return $this->hasMany('App\Server')->get()->sortBy('id');
     }
 
+    /**
+     * @param $permission
+     */
     public function hasPermissionScope($permission)
     {
         $this->permissions()->get()->where('name', $permission);
