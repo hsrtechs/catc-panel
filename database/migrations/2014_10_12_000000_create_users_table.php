@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->integer('available_storage')->unsigned();
             $table->integer('available_cpu')->unsigned();
             $table->integer('user_assoc')->unsigned();
+            
             $table->rememberToken();
             $table->timestamps();
 

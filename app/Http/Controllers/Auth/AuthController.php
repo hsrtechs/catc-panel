@@ -39,6 +39,7 @@ class AuthController extends Controller
 
     protected $username = 'username';
 
+    protected $loginView = 'gentelella.login';
     /**
      * Create a new authentication controller instance.
      *

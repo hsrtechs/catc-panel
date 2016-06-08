@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class TicketStatus extends Model
 {
-    protected $table = 'table_status';
+    protected $table = 'ticket_status';
 
     public function Tickets()
     {
         return $this->hasMany('App\Ticket');
     }
-
+    
     public function getClosedTickets()
     {
         return $this->findOrFail(0)->Tickets()->get();

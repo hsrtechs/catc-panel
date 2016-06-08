@@ -8,7 +8,7 @@
             <div class="col-md-12">
                 @if(count($servers))
                     @foreach($servers as $server)
-                        <div class="x_panel">
+                        <div class="x_panel" style="min-height: inherit">
                             <div class="x_title">
                                 <h2><strong>Server Label:</strong> {{ $server->label }}</h2>
                                 <ul class="nav navbar-right panel_toolbox">

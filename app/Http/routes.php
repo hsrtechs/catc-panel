@@ -11,6 +11,7 @@
 |
 */
 use \App\Log;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 Route::group([
@@ -30,21 +31,46 @@ Route::group([
     });
 
     Route::get('perm', function () {
-        $perms = ['Admin', 'Mod'];
+        $perms = ['Admin', 'Mod', 'Tickets', 'Profile'];
         foreach ($perms as $prem) {
-            $p = new \App\Permission();
+            $p = new \App\Permission;
             $r[] = $p->make($prem);
         }
         return $r;
     });
 
     Route::get('roles', function () {
-        $perms = ['Suspended', 'Terminated'];
+        $perms = ['Administrator','Moderator','Reseller','User','Suspended', 'Terminated'];
         foreach ($perms as $prem) {
-            $p = new \App\Role();
-            $p->make($prem);
+            $p = new \App\Role;
+            $r[] = $p->make($prem);
         }
+        return $r;
     });
+
+    Route::get('depart', function () {
+        $perms = ['Technical'];
+        foreach ($perms as $prem) {
+            $p = new \App\Department;
+            $r[] = $p->make($prem);
+        }
+        return $r;
+    });
+
+    Route::get('ticket/{num?}',function ($num = 1) {
+        $f = Faker\Factory::create();
+        for ($x = 1;$x <= $num; $x++){
+            $t = new \App\Ticket;
+            $t->title = $f->title;
+            $t->ticket_status_id = 1;
+            $t->department_id = 1;
+            $t->user_id = 1;
+            $t->desc = $f->text;
+
+            $r[] = $t->save();
+        }
+        return $r;
+    })->where(['num' => '[0-9]+']);
 
 }
 );
@@ -98,12 +124,12 @@ Route::post('password/reset', 'Auth\PasswordController@reset');
 
 Route::group([
     'prefix' => 'servers',
-    'middleware' => ['auth', 'server.owner'],
+    'middleware' => ['auth'],
     'as' => 'server::',
 ], function () {
 
-    Route::get('display/{id}', "ServerController@serverView")->name('display')->where(['id' => '[0-9]+']);
-    Route::get('lists', "ServerController@listServers")->name('lists');
+    Route::get('/', "ServerController@listServers");
+    Route::get('display/{id}', "ServerController@serverView")->name('display');
     Route::get('{id}/power/off', "ServerController@powerOff");
     Route::get('{id}/power/on', "ServerController@powerOn");
     Route::get('{id}/power/reboot', "ServerController@reboot");
@@ -112,4 +138,23 @@ Route::group([
     Route::get('{id}/console', "ServerController@console");
     Route::get('{id}/delete', "ServerController@delete");
 
+});
+
+Route::group([
+    'prefix' => 'ticket',
+    'middleware' => ['auth'],
+],function (){
+    Route::get('/','TicketsController@lists');
+    Route::get('{id}/display','TicketsController@view')->middleware('ticket.owner');
+    Route::get('answered','TicketsController@answered');
+    Route::get('un-answered','TicketsController@unAnswered');
+    Route::get('pending','TicketsController@pending');
+    Route::get('active','TicketsController@active');
+    Route::get('closed','TicketsController@closed');
+
+});
+
+
+Route::get('test',function (Request $request){
+    dd((new App\User)->find(2)->getUserTickets);
 });

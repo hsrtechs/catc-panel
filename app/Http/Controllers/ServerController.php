@@ -27,7 +27,7 @@ class ServerController extends Controller
     public function listServers(Request $request)
     {
         $user = $request->user();
-        $data = ['servers' => $user->getUserServers(), 'user' => $user];
+        $data = ['servers' => $user->Servers(), 'user' => $user];
         return view("gentelella.servers.list", $data);
     }
 

@@ -46,17 +46,34 @@
                         <a><i class="fa fa-edit"></i> Create Ticket</a>
                     </li>
                     <li>
-                        <a><i class="fa fa-mail-reply-all"></i> Active Tickets</a>
-                    </li>
-                    <li>
-                        <a><i class="fa fa-thumbs-up"></i> Closed Ticket</a>
+                        <a>
+                            <i class="fa fa-edit"></i> Tickets <span class="fa fa-chevron-circle-down"></span>
+                        </a>
+                        <ul class="nav child_menu">
+                            <li>
+                                <a href="{{ action('TicketsController@active') }}"><i class="fa fa-times-circle"></i> Active Tickets</a>
+                            </li>
+                            <li>
+                                <a href="{{ action('TicketsController@unAnswered') }}"><i class="fa fa-times-circle"></i> Un-Answered Ticket</a>
+                            </li>
+                            <li>
+                                <a href="{{ action('TicketsController@answered') }}"><i class="fa fa-thumbs-up"></i> Answered Ticket</a>
+                            </li>
+                            <li>
+                                <a href="{{ action('TicketsController@pending') }}"><i class="fa fa-remove"></i> Pending Tickets</a>
+                            </li>
+                            <li>
+                                <a href="{{ action('TicketsController@closed') }}"><i class="fa fa-thumbs-up"></i> Closed Ticket</a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="navbar-heading">
                         <h3>Account Section</h3>
                     </li>
                     <li>
-                        <a href="{{ action('UserController@Profile',['user' => $user->username]) }}"><i
-                                    class="fa fa-table"></i> Profile </a>
+                        <a href="{{ action('UserController@Profile',['user' => $user->username]) }}">
+                            <i class="fa fa-table"></i> Profile
+                        </a>
                     </li>
                 </ul>
             </div>

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserPermissionsTable extends Migration
+class UsersDepartment extends Migration
 {
     /**
      * Run the migrations.
@@ -12,18 +12,18 @@ class CreateUserPermissionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('users_permissions', function (Blueprint $table) {
+        Schema::create('users_departments', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->index();
-            $table->integer('permission_id');
-            $table->timestamps();
+            $table->integer('user_id');
+            $table->integer('department_id');
 
+            $table->timestamps();
             $table->foreign('user_id')
                 ->references('id')->on('users')
                 ->onDelete('cascade');
 
-            $table->foreign('permission_id')
-                ->references('id')->on('permissions')
+            $table->foreign('department_id')
+                ->references('id')->on('departments')
                 ->onDelete('cascade');
         });
     }
@@ -35,6 +35,6 @@ class CreateUserPermissionsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('users_permissions');
+        Schema::drop('users_departments');
     }
 }

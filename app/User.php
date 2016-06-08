@@ -85,9 +85,41 @@ class User extends Authenticatable
         return 'username';
     }
 
-    /**
-     *
-     */
+    public function Servers()
+    {
+        if($this->isAdmin() || $this->isMod())
+        {
+            return Server::all();
+        }elseif ($this->isReseller())
+        {
+            return $this->getUserServers->merge($this->getSubUserServers);
+        }elseif ($this->isNormalUser())
+        {
+            return $this->getUserServers;
+        }
+    }
+
+    public function Tickets()
+    {
+        if($this->isAdmin())
+        {
+            return Ticket::ActiveTickets();
+        }elseif($this->isMod())
+        {
+            if($this->hasPermission('Tickets'))
+            {
+                return $this->getSubUserTickets->merge($this->getTickets);
+            }else{
+                return $this->getTickets;
+            }
+        }elseif ($this->isReseller())
+        {
+            return $this->getSubUserTickets->merge($this->getTickets);
+        }elseif ($this->isNormalUser())
+        {
+            return $this->getTickets;
+        }
+    }
 
     /**
      * Finding the Roles of the USERS
@@ -146,13 +178,6 @@ class User extends Authenticatable
         return $this->all()->where('role_id', 4)->count();
     }
 
-    /**
-     * @return bool
-     */
-    public function isAdmin()
-    {
-        return $this->hasRole('Administrator');
-    }
 
     /**
      * @param $role
@@ -167,11 +192,11 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return bool
      */
-    public function role()
+    public function isAdmin()
     {
-        return $this->belongsTo('App\Role');
+        return $this->hasRole('Administrator');
     }
 
     /**
@@ -188,6 +213,11 @@ class User extends Authenticatable
     public function isReseller()
     {
         return $this->hasRole('Reseller');
+    }
+
+    public function isNormalUser()
+    {
+        return $this->hasRole('User');
     }
 
     /**
@@ -209,8 +239,6 @@ class User extends Authenticatable
         return false;
     }
 
-    // Accessors
-
     /**
      * @param $permission
      * @return bool
@@ -222,14 +250,38 @@ class User extends Authenticatable
         }
         return false;
     }
+    /**
+     * @param $permissions
+     * @return bool
+     */
+    public function hasAnyDepartment($departments)
+    {
+        if (is_array($departments)) {
+            foreach ($departments as $department) {
+                if ($this->hasDepartment($department)) {
+                    return true;
+                }
+            }
+        } elseif ($this->hasDepartment($departments)) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @param $department
+     * @return boolean
      */
-    public function permissions()
+    public function hasDepartment($department)
     {
-        return $this->belongsToMany('App\Permission', 'user_permissions');
+        if ($this->department()->where('name', $department)->get()->count()) {
+            return true;
+        }
+        return false;
     }
+
+    // Accessors
 
     /**
      * @return float
@@ -277,13 +329,7 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function userReseller()
-    {
-        return $this->belongsTo('App\User', 'user_assoc', 'id');
-    }
+
 
     /**
      * @param $value
@@ -298,31 +344,78 @@ class User extends Authenticatable
      */
     public function setUserAssocAttribute($value = NULL)
     {
-        $this->attributes['user_assoc'] = (!is_null($value)) ? $value : Auth::user()->id;
+        $this->attributes['user_assoc'] = (!is_null($value)) ? $value : 0;
+    }
+
+    /**
+     * Relationships
+     */
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function role()
+    {
+        return $this->belongsTo('App\Role');
+    }
+
+    public function department(){
+        return $this->belongsToMany('App\Department','users_departments');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany('App\Permission', 'users_permissions');
+    }
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function userReseller()
+    {
+        return $this->belongsTo('App\User','user_assoc');
+    }
+
+    public function getSubUsers(){
+        return $this->hasMany('App\User', 'user_assoc');
+    }
+    /**
+     * Finding tickets a belongs to users
+     */
+
+    public function getSubUserTickets()
+    {
+        return $this->hasManyThrough('App\Ticket','App\User','user_assoc');
+    }
+    /**
+     * Finding Servers a belongs to users
+     */
+
+    public function getSubUserServers()
+    {
+        return $this->hasManyThrough('App\Server','App\User','user_assoc');
+    }
+
+    /**
+     * Finding tickets a belongs to Departments
+     */
+
+    public function getDepartmentTickets()
+    {
+        return $this->hasManyThrough('App\Ticket','App\Department','id');
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function Tickets()
+    public function getTickets()
     {
         return $this->hasMany('App\Ticket');
     }
-
-    /**
-     * @param null $id
-     * @return boolean
-     */
-
-    public function ownsServerScope($id = NULL)
-    {
-        if ($this->getUserServers()->where('id', $id)->get()->count()) {
-            return true;
-        }
-        return false;
-    }
-
-    // Query Scopes
 
     /**
      * Return all the servers
@@ -331,13 +424,34 @@ class User extends Authenticatable
      */
     public function getUserServers()
     {
-        return $this->hasMany('App\Server')->get()->sortBy('id');
+        return $this->hasMany('App\Server');
+    }
+    /**
+     * @param null $id
+     * @return boolean
+     */
+
+
+    // Query Scopes
+
+
+    public function scopeOwnsServer($id = NULL)
+    {
+        if ($this->getUserServers()->where('id', $id)->get()->count()) {
+            return true;
+        }
+        return false;
+        return false;
+    }
+
+    public function scopeServers(){
+        return $this->getUserServers->sortBy('id');
     }
 
     /**
      * @param $permission
      */
-    public function hasPermissionScope($permission)
+    public function scopeHasPermission($permission)
     {
         $this->permissions()->get()->where('name', $permission);
     }

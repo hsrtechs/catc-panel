@@ -14,7 +14,8 @@ class UserController extends Controller
 {
     public function Dashboard(Request $request)
     {
-        if ($request->user()->isAdmin() || $request->user()->isMod()) {
+        if ($request->user()->isAdmin() || $request->user()->isMod())
+        {
             $data = [
                 'title' => 'Admin Dashboard',
                 'user' => $request->user(),
@@ -23,12 +24,12 @@ class UserController extends Controller
                 'tickets' => (new Ticket),
             ];
             return view('gentelella.admin.index', $data);
-        } else {
+        } else
+        {
             $data = [
                 'title' => 'User Dashboard',
                 'user' => $request->user(),
-                'servers' => $request->user()->getUserServers(),
-                'tickets' => $request->user()->tickets(),
+                'servers' => $request->user()->Servers(),
             ];
 
             return view('gentelella.servers.list', $data);
@@ -37,7 +38,8 @@ class UserController extends Controller
 
     public function Profile(Request $request, User $user)
     {
-        if (is_null($request->route()->parameter('user'))) {
+        if (is_null($request->route()->parameter('user')))
+        {
             $data = [
                 'title' => 'User Profile',
                 'user' => $request->user(),
@@ -45,7 +47,8 @@ class UserController extends Controller
                 'tickets' => $request->user()->Tickets(),
             ];
             return view('gentelella.user.profile', $data);
-        } elseif ($request->user()->isAdmin() || $request->user()->isMod() || ($request->user()->isReseller() && $request->user()->id === $user->userReseller->id) || $request->user()->id === $user->id) {
+        } elseif ($request->user()->isAdmin() || $request->user()->isMod() || $request->user === $user || ($request->user()->isReseller() && $user->userReseller === $request->user()))
+        {
             $data = [
                 'title' => 'User Profile',
                 'user' => $user,
@@ -53,9 +56,9 @@ class UserController extends Controller
                 'tickets' => $user->Tickets(),
             ];
             return view('gentelella.user.profile', $data);
-        } else {
+        } else
+        {
             return response('Access Denied', 401);
         }
-
     }
 }

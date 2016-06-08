@@ -34,13 +34,12 @@
         </div>
         <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top"><i class="fa fa-user"></i>Active Tickets</span>
-            <div class="count {{ ($tickets->Active() > 0) ? 'red' : 'green' }}">{{ $tickets->Active() }}</div>
-            <span class="count_bottom"><i class="green">{{ $tickets->Answered() }} </i> Answered, <i
-                        class="red">{{ $tickets->Pending() }} </i> Pending</span>
+            <div class="count {{ ($tickets->ActiveCount() > 0) ? 'red' : 'green' }}">{{ $tickets->ActiveCount() }}</div>
+            <span class="count_bottom"><i class="green">{{ $tickets->AnsweredCount() }} </i> Answered, <i class="red">{{ $tickets->PendingCount() }} </i> Pending</span>
         </div>
         <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top"><i class="fa fa-user"></i>Closed Tickets</span>
-            <div class="count green">{{ $tickets->Closed() }}</div>
+            <div class="count green">{{ $tickets->ClosedCount() }}</div>
         </div>
         <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top"><i class="fa fa-user"></i> Total Available CPU</span>

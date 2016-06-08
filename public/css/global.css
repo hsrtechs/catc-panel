@@ -22,3 +22,6 @@ div.panel-icons a i {
     padding: 5px;
     border-radius: 5px;
 }
+div.x_panel{
+    min-height: 560px;
+}
