@@ -99,43 +99,35 @@
                                     <div class="panel-body">
                                         <div class="clearfix"></div>
                                         <div class="text-c enter mtop20">
-                                            <a href="{{ action('ServerController@powerOn',['id'=>$server->id]) }}"
-                                               class="btn btn-app">
+                                            <a href="{{ action('ServerController@powerOn',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="fa fa-play"></i>
                                                 Power On
                                             </a>
-                                            <a href="{{ action('ServerController@powerOff',['id'=>$server->id]) }}"
-                                               class="btn btn-app">
+                                            <a href="{{ action('ServerController@powerOff',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="fa fa-pause"></i>
                                                 Power Off
                                             </a>
-                                            <a href="{{ action('ServerController@reboot',['id'=>$server->id]) }}"
-                                               class="btn btn-app">
+                                            <a href="{{ action('ServerController@reboot',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="fa fa-repeat"></i>
                                                 Reboot
                                             </a>
-                                            <a href="{{ action('ServerController@rdns',['id'=>$server->id]) }}"
-                                               class="btn btn-app">
+                                            <a href="{{ action('ServerController@rdns',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="glyphicon glyphicon-flash"></i>
                                                 R-DNS
                                             </a>
-                                            <a href="{{ action('ServerController@rename',['id'=>$server->id]) }}"
-                                               class="btn btn-app">
+                                            <a href="{{ action('ServerController@rename',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="fa fa-edit"></i>
                                                 Rename
                                             </a>
-                                            <a href="{{ action('ServerController@console',['id'=>$server->id]) }}"
-                                               class="btn btn-app">
+                                            <a href="{{ action('ServerController@console',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="glyphicon glyphicon-wrench"></i>
                                                 Console
                                             </a>
-                                            <a href="{{ action('ServerController@delete',['id'=>$server->id]) }}"
-                                               class="btn btn-app">
+                                            <a href="{{ action('ServerController@delete',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="glyphicon glyphicon-trash"></i>
                                                 Delete
                                             </a>
-                                            <a href="javascript;" class="btn btn-app" data-toggle="modal"
-                                               data-target=".logs-model">
+                                            <a href="javascript;" class="btn btn-app" data-toggle="modal" data-target=".logs-model">
                                                 <i class="fa fa-bullhorn"></i>
                                                 Logs
                                             </a>
@@ -172,7 +164,7 @@
                                                                             </li>
                                                                         @endforeach
                                                                     </ul>
-                                                            @endif
+                                                                @endif
                                                             <!-- end of user messages -->
                                                             </div>
                                                         </div>
@@ -204,13 +196,31 @@
 
 @section('css')
     <!-- iCheck -->
-    <link href="/css/green.css" rel="stylesheet">
-    <link href="/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <link href="/css/green.css" rel="stylesheet" />
+    <link href="/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" />
+    <link href="/css/pnotify.css" rel="stylesheet" />
+    <link href="/css/pnotify.buttons.css" rel="stylesheet" />
+    <link href="/css/pnotify.nonblock.css" rel="stylesheet" />
 @endsection
 
 @section('js')
     <script src="/js/bootstrap-progressbar.min.js"></script>
     <script src="/js/echarts.min.js"></script>
+    <script src="/js/pnotify.js"></script>
+    <script src="/js/pnotify.buttons.js"></script>
+    <script src="/js/pnotify.nonblock.js"></script>
+
+    <script>
+        $('a.action-button').click(function (e) {
+            e.preventDefault();
+            $.post($(this).attr('href'),{
+                'action': $(this).attr('data'),
+                '_token' : '{{ csrf_token() }}',
+            },function  (data, status){
+                new PNotify($.parseJSON(data));
+            });
+        });
+    </script>
 
     <!-- ECharts -->
     <script>
@@ -452,8 +462,8 @@
                         lang: [
                             "Text View",
                             "Close",
-                            "Refresh",
-                        ],
+                            "Refresh"
+                        ]
                     },
                     restore: {
                         show: true,

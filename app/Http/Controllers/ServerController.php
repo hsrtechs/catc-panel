@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class ServerController extends Controller
 {
     protected $_server,
-        $_api;
+              $_api;
 
 
     public function __construct(Wrapper $api)
@@ -56,14 +56,6 @@ class ServerController extends Controller
 
     }
 
-    /**
-     * @return Wrapper
-     */
-    protected function getApiSet()
-    {
-        return $this->_api;
-    }
-
     public function make()
     {
         $faker = Factory::create();
@@ -101,6 +93,22 @@ class ServerController extends Controller
         return json_encode($str);
     }
 
+    public function powerOn(Request $request)
+    {
+        $this->getApiSet();
+        return $this->format($request->all()['_token']);
+    }
+
+    public function reboot(Request $request)
+    {
+        return $this->format($request->all()['_token']);
+    }
+
+    public function powerOff(Request $request)
+    {
+        return $this->format($request->all()['_token']);
+    }
+
     public function serverView(Server $id, Request $request)
     {
         $data = [
@@ -109,6 +117,25 @@ class ServerController extends Controller
         ];
 
         return view('gentelella.servers.display', $data);
+    }
+
+    private function format($text = '', $title = 'Server Status', $type = "success")
+    {
+        return json_encode([
+            'title' => $title,
+            'text' => $text,
+            'type' => $type,
+            'styling' => 'bootstrap3',
+
+        ]);
+    }
+
+    /**
+     * @return Wrapper
+     */
+    protected function getApiSet()
+    {
+        return $this->_api;
     }
 
 }

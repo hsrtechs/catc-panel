@@ -122,21 +122,21 @@ Route::post('password/email', 'Auth\PasswordController@sendResetLinkEmail');
 Route::post('password/reset', 'Auth\PasswordController@reset');
 
 
+Route::get('servers', "ServerController@listServers");
 Route::group([
     'prefix' => 'servers',
     'middleware' => ['auth'],
     'as' => 'server::',
 ], function () {
 
-    Route::get('/', "ServerController@listServers");
     Route::get('display/{id}', "ServerController@serverView")->name('display');
-    Route::get('{id}/power/off', "ServerController@powerOff");
-    Route::get('{id}/power/on', "ServerController@powerOn");
-    Route::get('{id}/power/reboot', "ServerController@reboot");
-    Route::get('{id}/rdns', "ServerController@rdns");
-    Route::get('{id}/rename', "ServerController@rename");
-    Route::get('{id}/console', "ServerController@console");
-    Route::get('{id}/delete', "ServerController@delete");
+    Route::post('{id}/power/off', "ServerController@powerOff");
+    Route::post('{id}/power/on', "ServerController@powerOn");
+    Route::post('{id}/power/reboot', "ServerController@reboot");
+    Route::post('{id}/rdns', "ServerController@rdns");
+    Route::post('{id}/rename', "ServerController@rename");
+    Route::post('{id}/console', "ServerController@console");
+    Route::post('{id}/delete', "ServerController@delete");
 
 });
 
@@ -145,7 +145,7 @@ Route::group([
     'middleware' => ['auth'],
 ],function (){
     Route::get('/','TicketsController@lists');
-    Route::get('{id}/display','TicketsController@view')->middleware('ticket.owner');
+    Route::get('{id}/display','TicketsController@view');
     Route::get('answered','TicketsController@answered');
     Route::get('un-answered','TicketsController@unAnswered');
     Route::get('pending','TicketsController@pending');
@@ -153,8 +153,11 @@ Route::group([
     Route::get('closed','TicketsController@closed');
 
 });
+Route::get('test',function (Request $request) {
+    //return 'mai';
+    return view('test',['request' => $request ]);
+});
 
-
-Route::get('test',function (Request $request){
-    dd((new App\User)->find(2)->getUserTickets);
+Route::post('test',function (Request $request) {
+    return  dd($request->all());
 });

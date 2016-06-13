@@ -12,4 +12,9 @@ class TicketReply extends Model
     {
         return $this->belongsTo('App\Ticket');
     }
+
+    public function User()
+    {
+        return $this->belongsTo('App\User');
+    }
 }

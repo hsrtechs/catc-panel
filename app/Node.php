@@ -10,6 +10,23 @@ class Node extends Model
         'name', 'link', 'api_email', 'api_key', 'total_ram', 'total_cpu', 'total_storage', 'used_ram', 'used_cpu', 'used_storage'
     ];
 
+    public $node;
+
+    public function get($node_id = NULL)
+    {
+        if(empty($this->node))
+        {
+            if(is_null($node_id))
+            {
+                return false;
+            }else
+            {
+                $this->node = $node_id;
+            }
+        }
+        return $this->firstOrFail($this->node);
+    }
+
     public function totalAvailableRam()
     {
         return $this->totalRam() - $this->totalUsedRam();
@@ -68,5 +85,10 @@ class Node extends Model
     public function getNodeStorage($node_id)
     {
         return $this->firstOrFail($node_id)->total_storage;
+    }
+
+    public function setNode($node)
+    {
+        $this->node = $node;
     }
 }
