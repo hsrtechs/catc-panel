@@ -77,7 +77,7 @@ Route::group([
 
 
 Route::get('/', function () {
-    return view('welcome');
+    redirect(route('theme::home'));
 })->name('home');
 
 
