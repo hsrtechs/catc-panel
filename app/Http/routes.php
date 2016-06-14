@@ -154,10 +154,9 @@ Route::group([
 
 });
 Route::get('test',function (Request $request) {
-    //return 'mai';
     return view('test',['request' => $request ]);
 });
 
 Route::post('test',function (Request $request) {
-    return  dd($request->all());
+    dd($request->all());
 });

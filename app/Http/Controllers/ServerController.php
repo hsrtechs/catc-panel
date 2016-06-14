@@ -95,18 +95,17 @@ class ServerController extends Controller
 
     public function powerOn(Request $request)
     {
-        $this->getApiSet();
-        return $this->format($request->all()['_token']);
+        return $this->format    ("Powered On");
     }
 
     public function reboot(Request $request)
     {
-        return $this->format($request->all()['_token']);
+        return $this->format("Rebooted");
     }
 
     public function powerOff(Request $request)
     {
-        return $this->format($request->all()['_token']);
+        return $this->format("Powered Off");
     }
 
     public function serverView(Server $id, Request $request)
