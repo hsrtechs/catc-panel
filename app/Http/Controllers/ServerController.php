@@ -95,7 +95,7 @@ class ServerController extends Controller
 
     public function powerOn(Request $request)
     {
-        return $this->format    ("Powered On");
+        return $this->format("Powered On");
     }
 
     public function reboot(Request $request)

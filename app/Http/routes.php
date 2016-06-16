@@ -113,8 +113,8 @@ Route::post('login', 'Auth\AuthController@login');
 Route::get('logout', 'Auth\AuthController@logout')->name('logout');
 
 // Registration Routes...
-Route::get('register', 'Auth\AuthController@showRegistrationForm');
-Route::post('register', 'Auth\AuthController@register');
+//Route::get('register', 'Auth\AuthController@showRegistrationForm');
+//Route::post('register', 'Auth\AuthController@register');
 
 // Password Reset Routes...
 Route::get('password/reset/{token?}', 'Auth\PasswordController@showResetForm');
@@ -128,7 +128,6 @@ Route::group([
     'middleware' => ['auth'],
     'as' => 'server::',
 ], function () {
-
     Route::get('display/{id}', "ServerController@serverView")->name('display');
     Route::post('{id}/power/off', "ServerController@powerOff");
     Route::post('{id}/power/on', "ServerController@powerOn");
@@ -137,7 +136,6 @@ Route::group([
     Route::post('{id}/rename', "ServerController@rename");
     Route::post('{id}/console', "ServerController@console");
     Route::post('{id}/delete', "ServerController@delete");
-
 });
 
 Route::group([
@@ -151,8 +149,8 @@ Route::group([
     Route::get('pending','TicketsController@pending');
     Route::get('active','TicketsController@active');
     Route::get('closed','TicketsController@closed');
-
 });
+
 Route::get('test',function (Request $request) {
     return view('test',['request' => $request ]);
 });
