@@ -94,17 +94,10 @@ Route::group([
 ], function () {
 
     Route::get('dashboard', 'UserController@Dashboard')->name('home');
-
     Route::get('profile/{user?}', 'UserController@Profile');
-
     Route::get('settings', function () {
         return view('gentelella.index', ['user' => Auth::user()]);
     })->name('settings');
-
-    Route::get('login', function () {
-        return view('gentelella.index', ['user' => Auth::user()]);
-    })->name('login');
-
 });
 
 // Authentication Routes...
@@ -149,12 +142,4 @@ Route::group([
     Route::get('pending','TicketsController@pending');
     Route::get('active','TicketsController@active');
     Route::get('closed','TicketsController@closed');
-});
-
-Route::get('test',function (Request $request) {
-    return view('test',['request' => $request ]);
-});
-
-Route::post('test',function (Request $request) {
-    dd($request->all());
 });

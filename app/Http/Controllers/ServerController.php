@@ -26,6 +26,7 @@ class ServerController extends Controller
 
     public function listServers(Request $request)
     {
+        return $this->getApiSet()->getTemplates();
         $user = $request->user();
         $data = ['servers' => $user->Servers(), 'user' => $user];
         return view("gentelella.servers.list", $data);
@@ -106,6 +107,21 @@ class ServerController extends Controller
     public function powerOff(Request $request)
     {
         return $this->format("Powered Off");
+    }
+
+    public function delete(Request $request)
+    {
+        return $this->format("Server Deleted");
+    }
+
+    public function console(Request $request)
+    {
+        return $this->format("Server Deleted");
+    }
+
+    public function rename(Request $request)
+    {
+        return $this->format("Server Deleted");
     }
 
     public function serverView(Server $id, Request $request)
