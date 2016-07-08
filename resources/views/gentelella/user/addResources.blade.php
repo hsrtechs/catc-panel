@@ -1,3 +1,4 @@
+{{dd($user->id)}}
 @extends('gentelella.layout.main')
 @section('main')
     <div class="row">

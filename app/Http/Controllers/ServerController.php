@@ -154,15 +154,16 @@ class ServerController extends Controller
 
     public function addResources(Request $request, User $user = NULL)
     {
-//        return $user;
-        $data['user_id'] = ($user->id) ? $user->id : $request->user()->id;
+//        return $request->user()->role;
         if($request->user()->isAdmin() || $request->user()->isMod())
         {
-            $data['users'] = DB::table('users')->where('role_id','!=',0)->where('role_id','!=',10)->where('role_id','!=',9);
+            $data['users'] = DB::table('users')->where('role_id','!=',0)->where('role_id','!=',10)->where('role_id','!=',9)->get();
         }elseif ($request->user()->isReseller())
         {
-            $data['users'] = DB::table('users')->where('user_assoc',$request->user()->id)->where('role_id','!=',0)->where('role_id','!=',10)->where('role_id','!=',9);
+            $data['users'] = DB::table('users')->where('user_assoc',$request->user()->id)->where('role_id','!=',0)->where('role_id','!=',10)->where('role_id','!=',9)->get();
         }
+        $data['user_id'] = ($user->id) ? $user->id : $request->user()->id;
+        $data['user'] = $request->user();
         return view('gentelella.user.addResources',$data);
     }
 
