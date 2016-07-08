@@ -154,14 +154,16 @@ class ServerController extends Controller
 
     public function addResources(Request $request, User $user = NULL)
     {
-        return $user;
-        if($user->id)
+//        return $user;
+        $data['user_id'] = ($user->id) ? $user->id : $request->user()->id;
+        if($request->user()->isAdmin() || $request->user()->isMod())
         {
-            return $user;
-        }else
+            $data['users'] = DB::table('users')->where('role_id','!=',0)->where('role_id','!=',10)->where('role_id','!=',9);
+        }elseif ($request->user()->isReseller())
         {
-                
+            $data['users'] = DB::table('users')->where('user_assoc',$request->user()->id)->where('role_id','!=',0)->where('role_id','!=',10)->where('role_id','!=',9);
         }
+        return view('gentelella.user.addResources',$data);
     }
 
     public function addResourcesPost(Request $request)

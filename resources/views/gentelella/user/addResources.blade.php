@@ -24,8 +24,8 @@
                             <label class="control-label col-md-3 col-sm-3 col-xs-12">User:</label>
                             <div class="col-md-3 col-sm-3 col-xs-6">
                                 <select name="user_id" class="select2_single form-control" tabindex="-1">
-                                    @foreach(\App\User::all() as $user)
-                                        <option value="{{ $user->id }}">{{ $user->username }}</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}"{{($user->id === $user_id) ? ' selected' : ''}}>{{ $user->username }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -71,8 +71,6 @@
                             </div>
                         </div>
                     </form>
-                    @endif
-
                 </div>
             </div>
         </div>
