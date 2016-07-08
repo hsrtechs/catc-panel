@@ -19,6 +19,7 @@ class Tasks extends Migration
             $table->json('data');
             $table->integer('server_id')->index();
             $table->text('desc');
+            $table->engine = 'InnoDB';
             $table->timestamps();
 
             $table->foreign('server_id')

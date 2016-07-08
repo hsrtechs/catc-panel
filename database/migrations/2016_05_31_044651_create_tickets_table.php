@@ -19,6 +19,8 @@ class CreateTicketsTable extends Migration
             $table->integer('department_id')->index();
             $table->integer('user_id')->index();
             $table->string('desc');
+            $table->engine = 'InnoDB';
+
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

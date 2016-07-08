@@ -18,6 +18,8 @@ class CreateTicketsRepliesTable extends Migration
             $table->integer('user_id')->index();
             $table->integer('ticket_id')->index();
             $table->enum('rating', [0, 1, 2, 3, 4, 5]);
+            $table->engine = 'InnoDB';
+
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

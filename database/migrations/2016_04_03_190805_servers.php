@@ -33,6 +33,7 @@ class Servers extends Migration
             $table->string('vnc_pass')->nullable();
             $table->string('mode', 6)->nullable();
             $table->longText('desc')->nullable();
+            $table->engine = 'InnoDB';
             $table->timestamps();
 
             $table->foreign('user_id')

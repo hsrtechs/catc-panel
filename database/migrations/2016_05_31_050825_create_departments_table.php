@@ -16,6 +16,8 @@ class CreateDepartmentsTable extends Migration
             $table->increments('id')->index();
             $table->string('name');
             $table->string('desc')->nullable();
+            $table->engine = 'InnoDB';
+
             $table->timestamps();
         });
     }

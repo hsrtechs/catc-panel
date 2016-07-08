@@ -16,6 +16,8 @@ class UsersDepartment extends Migration
             $table->increments('id');
             $table->integer('user_id');
             $table->integer('department_id');
+            $table->engine = 'InnoDB';
+
 
             $table->timestamps();
             $table->foreign('user_id')

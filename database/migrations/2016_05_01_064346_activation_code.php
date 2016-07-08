@@ -16,6 +16,7 @@ class ActivationCode extends Migration
             $table->increments('id');
             $table->string('username')->unique()->index();
             $table->string('code', 64)->unique()->index();
+            $table->engine = 'InnoDB';
             $table->timestamp('created_at');
 
             $table->foreign('username')
