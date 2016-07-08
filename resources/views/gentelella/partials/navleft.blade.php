@@ -33,7 +33,7 @@
                         <h3>Manage Cloud</h3>
                     </li>
                     <li>
-                        <a><i class="fa fa-plus"></i> Build VPS</a>
+                        <a href="{{ action("ServerController@build") }}"><i class="fa fa-plus"></i> Build VPS</a>
                     </li>
                     <li>
                         <a href="{{ action('ServerController@listServers') }}"><i class="fa fa-wrench"></i> Manage

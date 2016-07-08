@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Controllers\Auth\AuthController;
+use App\Http\Requests\AlterServerRequested;
+use App\Http\Requests\BuildServerRequest;
+use App\Http\Requests\ServerRenameRequest;
+use App\User;
 use Illuminate\Http\Request;
-use App\Log;
-use Faker\Factory;
 use \hsrtech\catc\Wrapper;
 use \App\Server;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Psy\Exception\ErrorException;
 
 class ServerController extends Controller
 {
@@ -19,109 +22,124 @@ class ServerController extends Controller
 
     public function __construct(Wrapper $api)
     {
-        $this->middleware(['auth']);
         $this->_api = $api;
-
     }
 
     public function listServers(Request $request)
     {
-        return $this->getApiSet()->getTemplates();
         $user = $request->user();
         $data = ['servers' => $user->Servers(), 'user' => $user];
         return view("gentelella.servers.list", $data);
     }
 
-    public function create(Request $data)
+
+    /**
+     * @param BuildServerRequest|Request $request
+     * @return static
+     */
+    public function make(BuildServerRequest $request)
     {
-        $params = [
-            'cpu' => $data['cpu'],
-            'ram' => $data['ram'],
-            'storage' => $data['storage'],
-            'os' => $data['os'],
-        ];
-        $task = $this->getApiSet()->buildServer($params);
-        if ($task->status === 'ok') {
-            $data['sid'] = $task->data->sid;
-            Server::create($data);
+        $param = ['cpu' => $request->input('cpu'),'ram' => $request->input('ram'), 'storage' => $request->input('storage'), 'os' => $request->input('os')];
+        if($request->user()->checkResources($param)){
+            return response("Not Enough Resources",401);
         }
-        $params = [
-            'name' => 'Reboot Server',
-            'desc' => 'Creating a server.',
-            'data' => $task,
-            'action_code' => 2701,
-            'status' => $task->status,
-            'type' => 2,
-        ];
-        Log::make($params);
-
-    }
-
-    public function make()
-    {
-        $faker = Factory::create();
-
-        return Server::create([
-            'cpu' => 1,
-            'ram' => 1024,
-            'storage' => 100,
-            'os' => $faker->randomNumber(2, true),
-            'ip' => ip2long($faker->ipv4),
-            'user_id' => 1,
-            'sid' => $faker->randomNumber(6, true),
-            'used_ram' => $this->randomVales(10),
-            'used_cpu' => $this->randomVales(10),
-            'used_storage' => $this->randomVales(10),
-            'root_pass' => $faker->password,
-            'rdns' => $faker->domainName,
-            'label' => $faker->userName,
-            'vnc_port' => $faker->randomNumber(4, true),
-            'vnc_pass' => $faker->password,
-            'status' => 1,
-            'mode' => 1,
-            'desc' => $faker->realText()
+        $server = ($this->getApiSet()->buildServer($param));
+        if($server->status !== 'ok'){
+            $log = (array) $server;
+            $log['user_id'] = $request->user()->id;
+            $log = array_merge($log,$param);
+            Log::critical('Server Build Failed',$log);
+            return response('Something went wrong. Please try again in a little bit.',504);
+        }
+        Server::create([
+            'cpu' => $param['cpu'],
+            'ram' => $param['ram'],
+            'storage' => $param['storage'],
+            'os' => $param['os'],
+            'user_id' => $request->user()->id,
+            'sid' => 0,
+            'name' => $server->servername,
+            'ip' => "0.0.0.0",
         ]);
+        $request->user()->update([
+            'available_ram' => $request->user()->available_ram - $param['ram'],
+            'available_cpu' => $request->user()->available_cpu - $param['cpu'],
+            'available_storage' => $request->user()->available_storage - $param['storage'],
+        ]);
+        return redirect(url('/'));
     }
 
-    private function randomVales($num)
+    public function build(Request $request)
     {
-        $i = 1;
-        $str = array();
-        while ($i <= $num) {
-            $str[] = rand(0, 100);
-            $i++;
+        $data = ['user' => $request->user(), 'templates' => Server::templates()];
+        return view('gentelella.servers.build',$data);
+    }
+
+    public function changeServerOwner(Request $request,Server $id)
+    {
+        $data = ['user' => $request->user(),'id' => $id->id,'uid' => $id->user_id,'users' => DB::table('users')->where('role_id','!=',9)->where('role_id','!=',10)->get()];
+        return view('gentelella.servers.changeOwner',$data);
+    }
+
+
+    public function changeServerOwnerPost(AlterServerRequested $request, Server $id)
+    {
+        if(!$id->update(['user_id' => $request->user])){
+            return $this->format('Server Transfer Failed.');
         }
-        return json_encode($str);
+        return redirect(action('ServerController@serverView',$id->id));
     }
 
-    public function powerOn(Request $request)
+
+    public function powerOn(Request $request,Server $id)
     {
-        return $this->format("Powered On");
+        if($this->getApiSet()->powerOnServer($id->sid)->Response()){
+            ($id->update(['status' => 'Powered On']));
+            return $this->format("Powered On",'Server');
+        }return $this->format("API Failed");
     }
 
-    public function reboot(Request $request)
+    public function reboot(Request $request, Server $id)
     {
-        return $this->format("Rebooted");
+        if($this->getApiSet()->rebootServer($id->sid)->Response()){
+            $id->update(['status' => 'Powered Off']);
+            return $this->format("Reboot",'Server');
+        }return $this->format("API Failed");
     }
 
-    public function powerOff(Request $request)
+    public function powerOff(Request $request, Server $id)
     {
-        return $this->format("Powered Off");
+        if($this->getApiSet()->powerOffServer($id->sid)->Response()){
+            $id->update(['status' => "Powered Off"]);
+            return ($this->format("Powered Off",'Server'));
+        }return $this->format("API Failed");
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request, Server $id)
     {
-        return $this->format("Server Deleted");
+        if($this->getApiSet()->deleteServer($id->sid)->Response()){
+            $id->delete();
+            return redirect(route('server::list'));
+        }return $this->format("API Failed");
     }
 
-    public function console(Request $request)
+    public function console(Request $request,Server $id)
     {
-        return $this->format("Server Deleted");
+        return redirect("http://panel.vps-hosting.ca:40181/console.html?servername={$id->name}&hostname=esx1200.cloudatcost.com&sshkey={$id->vnc_port}&sha1hash={$id->vnc_pass}");
     }
 
-    public function rename(Request $request)
+    public function rename(ServerRenameRequest $request, Server $id)
     {
-        return $this->format("Server Deleted");
+        $id->update(['label' => $request->servername]);
+        return redirect(action("ServerController@serverView",$id->id));
+    }
+
+    public function rdns(ServerRenameRequest $request, Server $id)
+    {
+        if($this->getApiSet()->setRDNS($id->sid,$request->servername)->Response()){
+            $id->update(['rdns' => $request->servername]);
+            return redirect(action("ServerController@serverView",$id->id));
+        }else return response("Something went wrong.",102);
     }
 
     public function serverView(Server $id, Request $request)
@@ -134,6 +152,30 @@ class ServerController extends Controller
         return view('gentelella.servers.display', $data);
     }
 
+    public function addResources(Request $request, User $user = NULL)
+    {
+        return $user;
+        if($user->id)
+        {
+            return $user;
+        }else
+        {
+                
+        }
+    }
+
+    public function addResourcesPost(Request $request)
+    {
+        $user = User::where('id',$request->user_id);
+        $u = $user->get();
+        $user->update([
+            'available_cpu' => $u->available_cpu + $request->cpu,
+            'available_ram' => $u->available_ram + $request->ram,
+            'available_storage' => $u->available_storage + $request->storage,
+        ]);
+        return $this->format("Server Updated","Action Status");
+    }
+
     private function format($text = '', $title = 'Server Status', $type = "success")
     {
         return json_encode([
@@ -141,6 +183,7 @@ class ServerController extends Controller
             'text' => $text,
             'type' => $type,
             'styling' => 'bootstrap3',
+            'result' => ($type === "success") ? true : false,
 
         ]);
     }

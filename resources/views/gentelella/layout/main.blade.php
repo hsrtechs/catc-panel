@@ -50,8 +50,17 @@
                                 </li>
                             </ul>
                         </li>
-
-
+                        <li class="">
+                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                Admin Options
+                                <span class=" fa fa-angle-down"></span>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a href="{{ action('ServerController@addResources') }}">Add Resources</a>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                 </nav>
             </div>

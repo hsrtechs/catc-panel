@@ -24,7 +24,7 @@
         </div>
         <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top"><i class="fa fa-user"></i> Total Servers</span>
-            <div class="count green">{{ $servers->all()->count() }}</div>
+            <div class="count green">{{ $servers }}</div>
         </div>
     </div>
     <div class="row tile_count">
@@ -58,72 +58,72 @@
         </div>
     </div>
     <!-- /top tiles -->
-    <div class="row">
-        <div class="col-md-4">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>Users
-                        <small>Logs</small>
-                    </h2>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <article class="media event">
-                        <a class="pull-left date">
-                            <p class="month">April</p>
-                            <p class="day">23</p>
-                        </a>
-                        <div class="media-body">
-                            <a class="title" href="#">Item One Title</a>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>Server
-                        <small>Logs</small>
-                    </h2>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <article class="media event">
-                        <a class="pull-left date">
-                            <p class="month">April</p>
-                            <p class="day">23</p>
-                        </a>
-                        <div class="media-body">
-                            <a class="title" href="#">Item One Title</a>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2>Server
-                        <small>Logs</small>
-                    </h2>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <article class="media event">
-                        <a class="pull-left date">
-                            <p class="month">April</p>
-                            <p class="day">23</p>
-                        </a>
-                        <div class="media-body">
-                            <a class="title" href="#">Item One Title</a>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{--<div class="row">--}}
+        {{--<div class="col-md-4">--}}
+            {{--<div class="x_panel">--}}
+                {{--<div class="x_title">--}}
+                    {{--<h2>Users--}}
+                        {{--<small>Logs</small>--}}
+                    {{--</h2>--}}
+                    {{--<div class="clearfix"></div>--}}
+                {{--</div>--}}
+                {{--<div class="x_content">--}}
+                    {{--<article class="media event">--}}
+                        {{--<a class="pull-left date">--}}
+                            {{--<p class="month">April</p>--}}
+                            {{--<p class="day">23</p>--}}
+                        {{--</a>--}}
+                        {{--<div class="media-body">--}}
+                            {{--<a class="title" href="#">Item One Title</a>--}}
+                            {{--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>--}}
+                        {{--</div>--}}
+                    {{--</article>--}}
+                {{--</div>--}}
+            {{--</div>--}}
+        {{--</div>--}}
+        {{--<div class="col-md-4">--}}
+            {{--<div class="x_panel">--}}
+                {{--<div class="x_title">--}}
+                    {{--<h2>Server--}}
+                        {{--<small>Logs</small>--}}
+                    {{--</h2>--}}
+                    {{--<div class="clearfix"></div>--}}
+                {{--</div>--}}
+                {{--<div class="x_content">--}}
+                    {{--<article class="media event">--}}
+                        {{--<a class="pull-left date">--}}
+                            {{--<p class="month">April</p>--}}
+                            {{--<p class="day">23</p>--}}
+                        {{--</a>--}}
+                        {{--<div class="media-body">--}}
+                            {{--<a class="title" href="#">Item One Title</a>--}}
+                            {{--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>--}}
+                        {{--</div>--}}
+                    {{--</article>--}}
+                {{--</div>--}}
+            {{--</div>--}}
+        {{--</div>--}}
+        {{--<div class="col-md-4">--}}
+            {{--<div class="x_panel">--}}
+                {{--<div class="x_title">--}}
+                    {{--<h2>Server--}}
+                        {{--<small>Logs</small>--}}
+                    {{--</h2>--}}
+                    {{--<div class="clearfix"></div>--}}
+                {{--</div>--}}
+                {{--<div class="x_content">--}}
+                    {{--<article class="media event">--}}
+                        {{--<a class="pull-left date">--}}
+                            {{--<p class="month">April</p>--}}
+                            {{--<p class="day">23</p>--}}
+                        {{--</a>--}}
+                        {{--<div class="media-body">--}}
+                            {{--<a class="title" href="#">Item One Title</a>--}}
+                            {{--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>--}}
+                        {{--</div>--}}
+                    {{--</article>--}}
+                {{--</div>--}}
+            {{--</div>--}}
+        {{--</div>--}}
+    {{--</div>--}}
 @endsection

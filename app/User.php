@@ -85,6 +85,9 @@ class User extends Authenticatable
         return 'username';
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|mixed|static[]
+     */
     public function Servers()
     {
         if($this->isAdmin() || $this->isMod())
@@ -99,6 +102,9 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function Tickets()
     {
         if($this->isAdmin())
@@ -119,15 +125,6 @@ class User extends Authenticatable
         {
             return $this->getTickets;
         }
-    }
-
-    /**
-     * Finding the Roles of the USERS
-     */
-
-    public function users()
-    {
-        return $this->all();
     }
 
     /**
@@ -194,6 +191,15 @@ class User extends Authenticatable
     /**
      * @return bool
      */
+    public function isActivated()
+    {
+        return $this->role_id === 0;
+    }
+
+
+    /**
+     * @return bool
+     */
     public function isAdmin()
     {
         return $this->hasRole('Administrator');
@@ -215,9 +221,28 @@ class User extends Authenticatable
         return $this->hasRole('Reseller');
     }
 
+    /**
+     * @return bool
+     */
     public function isNormalUser()
     {
         return $this->hasRole('User');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSuspended()
+    {
+        return $this->hasRole('Suspended');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTerminated()
+    {
+        return $this->hasRole('Terminated');
     }
 
     /**
@@ -239,13 +264,41 @@ class User extends Authenticatable
         return false;
     }
 
+    public function hasAnyRole($roles)
+    {
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if ($this->hasRole($role)) {
+                    return true;
+                }
+            }
+        } elseif ($this->hasRole($roles)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $resources
+     * @return bool
+     */
+    public function checkResources($resources)
+    {
+        if($this->available_cpu >= $resources['cpu'] && $this->available_ram >= $resources['ram'] && $this->available_storage >= $resources['storage'])
+        {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param $permission
      * @return bool
      */
     public function hasPermission($permission)
     {
-        if ($this->permissions()->where('name', $permission)->get()->count()) {
+        if ($this->permissions()->where('name', $permission)->count()) {
             return true;
         }
         return false;
@@ -288,10 +341,10 @@ class User extends Authenticatable
      */
     public function getCpuPercentageAttribute()
     {
-        return $this->available_cpu * 100 / $this->max_cpu;
+        return is_null($this->available_cpu) ? 0 : $this->available_cpu * 100 / $this->max_cpu;
     }
 
-    //Mutators
+    //Mutaters
     // Setting the Attributes after getting them from database
 
     /**
@@ -299,7 +352,7 @@ class User extends Authenticatable
      */
     public function getRamPercentageAttribute()
     {
-        return $this->available_ram * 100 / $this->max_ram;
+        return is_null($this->available_cpu) ? 0 : $this->available_ram * 100 / $this->max_ram;
     }
 
     /**
@@ -307,7 +360,7 @@ class User extends Authenticatable
      */
     public function getStoragePercentageAttribute()
     {
-        return $this->available_storage * 100 / $this->max_storage;
+        return is_null($this->available_cpu) ? 0 : $this->available_storage * 100 / $this->max_storage;
     }
 
 
@@ -359,6 +412,9 @@ class User extends Authenticatable
         return $this->belongsTo('App\Role');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function department(){
         return $this->belongsToMany('App\Department','users_departments');
     }
@@ -380,6 +436,9 @@ class User extends Authenticatable
         return $this->belongsTo('App\User','user_assoc');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function getSubUsers(){
         return $this->hasMany('App\User', 'user_assoc');
     }
@@ -435,15 +494,33 @@ class User extends Authenticatable
     // Query Scopes
 
 
+    /**
+     * @return bool
+     */
+    public function hasResources()
+    {
+        return !($this->available_cpu > 0 && $this->available_storage > 10 && $this->available_ram > 512);
+    }
+
+    /**
+     * @param null $id
+     * @return bool
+     */
     public function scopeOwnsServer($id = NULL)
     {
-        if ($this->getUserServers()->where('id', $id)->get()->count()) {
+        if ($this->getUserServers->where('id', $id)->count() || $this->isAdmin() || $this->isMod())
+        {
+            return true;
+        }else if($this->isReseller() && $this->getSubUserServers->where('id',$id)->count())
+        {
             return true;
         }
         return false;
-        return false;
     }
 
+    /**
+     * @return mixed
+     */
     public function scopeServers(){
         return $this->getUserServers->sortBy('id');
     }
@@ -455,4 +532,22 @@ class User extends Authenticatable
     {
         $this->permissions()->get()->where('name', $permission);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function scopeUsers()
+    {
+        return $this->all();
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function scopeActiveUsers()
+    {
+        return $this->where('role_id','!=',0)->where('role_id','!=',9)->where('role_id','!=',10)->get();
+    }
+
 }

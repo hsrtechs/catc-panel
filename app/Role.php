@@ -36,5 +36,6 @@ class Role extends Model
     {
         return $this->findOrFail(4)->users()->get()->count();
     }
+    
 
 }

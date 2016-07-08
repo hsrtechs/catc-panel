@@ -10,14 +10,13 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-use \App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 Route::group([
     'prefix' => 'make'], function () {
 
-    Route::get('server', 'serverController@make');
+    Route::get('server', 'ServerController@make');
     Route::get('log', function () {
         $params = [
             'name' => 'Reboot Server',
@@ -27,7 +26,7 @@ Route::group([
             'status' => 'OK',
             'type' => 2,
         ];
-        return Log::make($params);
+        return \App\Log::make($params);
     });
 
     Route::get('perm', function () {
@@ -81,11 +80,6 @@ Route::get('/', function () {
 })->name('home');
 
 
-Route::group(['middleware' => 'auth'], function () {
-
-    Route::get('/home', 'HomeController@index');
-
-});
 
 Route::group([
     'prefix' => 'theme',
@@ -98,6 +92,7 @@ Route::group([
     Route::get('settings', function () {
         return view('gentelella.index', ['user' => Auth::user()]);
     })->name('settings');
+    Route::post('addResources', "ServerController@addResources");
 });
 
 // Authentication Routes...
@@ -118,17 +113,28 @@ Route::post('password/reset', 'Auth\PasswordController@reset');
 Route::get('servers', "ServerController@listServers");
 Route::group([
     'prefix' => 'servers',
-    'middleware' => ['auth'],
-    'as' => 'server::',
+    'middleware' => ['auth','server.owner'],
 ], function () {
-    Route::get('display/{id}', "ServerController@serverView")->name('display');
+    Route::get('build', "ServerController@build");
+    Route::post('make', "ServerController@make");
+    Route::get('display/{id}', "ServerController@serverView");
     Route::post('{id}/power/off', "ServerController@powerOff");
     Route::post('{id}/power/on', "ServerController@powerOn");
     Route::post('{id}/power/reboot', "ServerController@reboot");
     Route::post('{id}/rdns', "ServerController@rdns");
     Route::post('{id}/rename', "ServerController@rename");
-    Route::post('{id}/console', "ServerController@console");
+    Route::get('{id}/console', "ServerController@console");
     Route::post('{id}/delete', "ServerController@delete");
+
+    Route::group([
+        'roles' => ['Administrator','Moderator','Reseller'],
+        'middleware' => ['roles'],
+    ],function (){
+        Route::post('alter/{id}', "ServerController@changeServerOwnerPost");
+        Route::get('alter/{id}', "ServerController@changeServerOwner");
+        Route::get('addResources/{user?}', "ServerController@addResources");
+        Route::post('addResources', "ServerController@addResourcesPost");
+    });
 });
 
 Route::group([
@@ -142,4 +148,15 @@ Route::group([
     Route::get('pending','TicketsController@pending');
     Route::get('active','TicketsController@active');
     Route::get('closed','TicketsController@closed');
+});
+Route::get('test',function (Request $r)
+{
+    \Session::flash('set1','neadaw set');
+    if(\Session::has('set1')){
+        echo \Session::get('set1');
+    }
+});
+
+Route::get('log',function (){
+    (\Log::getMonolog());
 });

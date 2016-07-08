@@ -15,11 +15,11 @@ class ServerOwnerMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if ($request->user() === NULL) {
+        if ($request->user() === NULL)
+        {
             return redirect()->action('Auth\AuthController@login');
-        } elseif ($request->user()->isAdmin() || $request->user()->isMod()) {
-            return $next($request);
-        } elseif (!$request->user()->ownsServer($request->id)) {
+        } elseif (!$request->user()->ownsServer($request->id))
+        {
             return response('Un-Authorized', 401);
         }
         return $next($request);

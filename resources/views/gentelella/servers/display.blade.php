@@ -1,6 +1,11 @@
 @extends('gentelella.layout.main')
 @section('main')
     <!-- page content -->
+<?php
+    $server->used_cpu = $server->completeArray($server->used_cpu);
+    $server->used_ram = $server->completeArray($server->used_ram);
+    $server->used_storage = $server->completeArray($server->used_storage);
+?>
     <div class="">
         @include('gentelella.partials.page-tittle',['heading'=> 'Server #'.$server->id.' '.$server->label,'small' => 'Details','desc' => $server->desc])
         <div class="row">
@@ -9,7 +14,7 @@
                     <div class="x_title">
                         <h2>{{ $server->label }}</h2>
                         <div class="text-right">
-                            <p class="btn btn-{{ ($server->status === "Powered ON") ? 'success' : 'danger' }}"
+                            <p class="btn btn-{{ ($server->status === "Powered On") ? 'success' : 'danger' }}"
                                style="width: 100%; max-width: 150px;"> {{ $server->status }} </p>
                         </div>
                         <div class="clearfix"></div>
@@ -23,11 +28,11 @@
                                 </li>
                                 <li>
                                     <span class="name"> Ram </span>
-                                    <span class="value text-success text-wrap"> {{ $server->ram }} </span>
+                                    <span class="value text-success text-wrap"> {{ $server->ram }} MB</span>
                                 </li>
                                 <li class="hidden-phone">
                                     <span class="name"> Storage </span>
-                                    <span class="value text-success text-wrap"> {{ $server->storage }} </span>
+                                    <span class="value text-success text-wrap"> {{ $server->storage }} GB</span>
                                 </li>
                             </ul>
                             <ul class="stats-overview">
@@ -42,6 +47,20 @@
                                 <li class="hidden-phone">
                                     <span class="name"> OS </span>
                                     <span class="value text-success text-wrap"> {{ $server->os }} </span>
+                                </li>
+                            </ul>
+                            <ul class="stats-overview">
+                                <li>
+                                    <span class="name"> Default SSH Port </span>
+                                    <span class="value text-success text-wrap"> 22 </span>
+                                </li>
+                                <li class="hidden-phone">
+                                    <span class="name"> Default SSH User </span>
+                                    <span class="value text-success text-wrap"> root </span>
+                                </li>
+                                <li>
+                                    <span class="name"> SSH Root Pass </span>
+                                    <span class="value text-success text-wrap"> {{ $server->root_pass }} </span>
                                 </li>
                             </ul>
                             <ul class="stats-overview">
@@ -64,25 +83,18 @@
                                 Server #{{ $server->id }} usage
                             </h3>
                             <div class="progress">
-                                <div class="progress-bar progress-bar-striped active @if($server->used_storage[9] < 20) progress-bar-primary @elseif($server->used_storage[9] >= 20 && $server->used_storage[9] <= 50) progress-bar-success @elseif($server->used_storage[9] > 50 && $server->used_storage[9] <= 70) progress-bar-warning @else progress-bar-danger @endif"
-                                     role="progressbar" aria-valuenow="{{ $server->used_storage[9] }}"
-                                     aria-valuemin="40" aria-valuemax="100"
-                                     style="width: {{ $server->used_storage[9] }}%; min-width: 35%;">
-                                    Storage: {{ $server->used_storage[9] }}%
-                                </div>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped active @if($server->used_cpu[9] < 20) progress-bar-primary @elseif($server->used_cpu[9] >= 20 && $server->used_cpu[9] <= 50) progress-bar-success @elseif($server->used_cpu[9] > 50 && $server->used_cpu[9] <= 70) progress-bar-warning @else progress-bar-danger @endif"
-                                     role="progressbar" aria-valuenow="{{ $server->used_cpu[9] }}" aria-valuemin="40"
-                                     aria-valuemax="100" style="width: {{ $server->used_cpu[9] }}%; min-width: 35%;">
+                                <div class="progress-bar progress-bar-striped active @if($server->used_cpu[9] < 20) progress-bar-primary @elseif($server->used_cpu[9] >= 20 && $server->used_cpu[9] <= 50) progress-bar-success @elseif($server->used_cpu[9] > 50 && $server->used_cpu[9] <= 70) progress-bar-warning @else progress-bar-danger @endif" role="progressbar" aria-valuenow="{{ $server->used_cpu[9] }}" aria-valuemin="40" aria-valuemax="100" style="width: {{ $server->used_cpu[9] }}%; min-width: 35%;">
                                     CPU: {{ $server->used_cpu[9] }}%
                                 </div>
                             </div>
                             <div class="progress">
-                                <div class="progress-bar progress-bar-striped active @if($server->used_ram[9] < 20) progress-bar-primary @elseif($server->used_ram[9] >= 20 && $server->used_ram[9] <= 50) progress-bar-success @elseif($server->used_ram[9] > 50 && $server->used_ram[9] <= 70) progress-bar-warning @else progress-bar-danger @endif"
-                                     role="progressbar" aria-valuenow="{{ $server->used_ram[9] }}" aria-valuemin="40"
-                                     aria-valuemax="100" style="width: {{ $server->used_ram[9] }}%; min-width: 35%;">
-                                    Storage: {{ $server->used_ram[9] }}%
+                                <div class="progress-bar progress-bar-striped active @if($server->used_ram[9] < 20) progress-bar-primary @elseif($server->used_ram[9] >= 20 && $server->used_ram[9] <= 50) progress-bar-success @elseif($server->used_ram[9] > 50 && $server->used_ram[9] <= 70) progress-bar-warning @else progress-bar-danger @endif" role="progressbar" aria-valuenow="{{ $server->used_ram[9] }}" aria-valuemin="40" aria-valuemax="100" style="width: {{ $server->used_ram[9] }}%; min-width: 35%;">
+                                    Ram: {{ $server->used_ram[9] }}%
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped active @if($server->used_storage[9] < 20) progress-bar-primary @elseif($server->used_storage[9] >= 20 && $server->used_storage[9] <= 50) progress-bar-success @elseif($server->used_storage[9] > 50 && $server->used_storage[9] <= 70) progress-bar-warning @else progress-bar-danger @endif" role="progressbar" aria-valuenow="{{ $server->used_storage[9] }}" aria-valuemin="40" aria-valuemax="100" style="width: {{ $server->used_storage[9] }}%; min-width: 40%;">
+                                    Storage: {{ $server->used_storage[9] }}%
                                 </div>
                             </div>
                         </div>
@@ -111,14 +123,65 @@
                                                 <i class="fa fa-repeat"></i>
                                                 Reboot
                                             </a>
-                                            <a href="{{ action('ServerController@rdns',['id'=>$server->id]) }}" class="btn btn-app action-button">
-                                                <i class="glyphicon glyphicon-flash"></i>
-                                                R-DNS
+                                            <a href="javascript;" class="btn btn-app" data-toggle="modal" data-target=".rdns-model">
+                                                <i class="fa fa-edit"></i>
+                                                RDNS
                                             </a>
-                                            <a href="{{ action('ServerController@rename',['id'=>$server->id]) }}" class="btn btn-app action-button">
+                                            <div class="modal fade rdns-model" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                            <h4 class="modal-title" id="myModalLabel">Change RDNS</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form class="form-inline" id="rdns-form" method="post" action="{{ action('ServerController@rdns',['id'=>$server->id]) }}">
+                                                                <div class="form-group">
+                                                                    <input name="servername" class="form-control" type="text" placeholder="Server rdns" />
+                                                                    {{ csrf_field() }}
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-success" form="rdns-form">Submit</button>
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <a href="javascript;" class="btn btn-app" data-toggle="modal" data-target=".rename-model">
                                                 <i class="fa fa-edit"></i>
                                                 Rename
                                             </a>
+                                            <div class="modal fade rename-model" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                            <h4 class="modal-title" id="myModalLabel">Rename Server</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form class="form-inline" id="name-form" method="post" action="{{ action('ServerController@rename',['id'=>$server->id]) }}">
+                                                                <div class="form-group">
+                                                                    <input class="form-control" type="text" placeholder="Server Name" name="servername" />
+                                                                    {{ csrf_field() }}
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-success" form="name-form">Submit</button>
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <a href="{{ action('ServerController@console',['id'=>$server->id]) }}" class="btn btn-app action-button">
                                                 <i class="glyphicon glyphicon-wrench"></i>
                                                 Console
@@ -132,8 +195,7 @@
                                                 Logs
                                             </a>
 
-                                            <div class="modal fade logs-model" tabindex="-1" role="dialog"
-                                                 aria-hidden="true" style="display: none;">
+                                            <div class="modal fade logs-model" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
 
@@ -141,8 +203,7 @@
                                                             <button type="button" class="close" data-dismiss="modal">
                                                                 <span aria-hidden="true">×</span>
                                                             </button>
-                                                            <h4 class="modal-title" id="myModalLabel">Recent
-                                                                Activity</h4>
+                                                            <h4 class="modal-title" id="myModalLabel">Recent Activity</h4>
                                                         </div>
                                                         <div class="modal-body">
                                                             <div>
@@ -169,8 +230,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-danger"
-                                                                    data-dismiss="modal">Close
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close
                                                             </button>
                                                         </div>
 
@@ -217,7 +277,9 @@
                 'action': $(this).attr('data'),
                 '_token' : '{{ csrf_token() }}',
             },function  (data, status){
-                new PNotify($.parseJSON(data));
+                var receive;
+                receive = $.parseJSON(data);
+                new PNotify(receive);
             });
         });
     </script>
@@ -483,7 +545,7 @@
             xAxis: [{
                 type: 'category',
                 data: [
-                    @for($i = 50; $i >= 1; $i-=5)
+                    @for($i = 50; $i >= 0; $i-=5)
                             "{{ Carbon\Carbon::now()->subMinutes($i)->diffForHumans() }}.",
                     @endfor
                 ]
@@ -507,13 +569,13 @@
                 type: 'line',
                 smooth: true,
                 itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                data:  {{  json_encode($server->used_cpu) }} ,
+                data:  {!! json_encode($server->used_cpu) !!} ,
             }, {
                 name: 'RAM',
                 type: 'line',
                 smooth: true,
                 itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                data: {{ json_encode($server->used_ram) }},
+                data: {!! json_encode($server->used_ram) !!},
             }]
         });
     </script>

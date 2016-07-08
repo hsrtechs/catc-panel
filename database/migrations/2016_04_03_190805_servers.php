@@ -18,13 +18,14 @@ class Servers extends Migration
             $table->integer('sid')->index();
             $table->integer('ip');
             $table->integer('os');
-            $table->integer('ram');
-            $table->integer('storage');
-            $table->integer('cpu');
+            $table->integer('ram')->unsigned();
+            $table->integer('storage')->unsigned();
+            $table->integer('cpu')->unsigned();
             $table->json('used_ram')->nullable();
             $table->json('used_storage')->nullable();
             $table->json('used_cpu')->nullable();
             $table->string('label')->nullable();
+            $table->string('name');
             $table->string('rdns')->nullable();
             $table->enum('status', [0, 1, -1])->nullable();
             $table->string('root_pass')->nullable();

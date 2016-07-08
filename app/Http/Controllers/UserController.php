@@ -20,7 +20,7 @@ class UserController extends Controller
                 'title' => 'Admin Dashboard',
                 'user' => $request->user(),
                 'node' => (new Node),
-                'servers' => (new Server),
+                'servers' => \DB::table('servers')->count(),
                 'tickets' => (new Ticket),
             ];
             return view('gentelella.admin.index', $data);
